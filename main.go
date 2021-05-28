@@ -34,7 +34,15 @@ func walk(router *mux.Router) {
 }
 
 func buildUrl(urlSnippet string, complement ...string) (*url.URL, error) {
-	return url.Parse(fmt.Sprintf(urlSnippet, complement))
+	var genericStrings []interface{} = make([]interface{}, len(complement))
+	for i, s := range complement {
+		genericStrings[i] = s
+	}
+	return url.Parse(fmt.Sprintf(urlSnippet, genericStrings...))
+}
+
+func fetch(url *url.URL) (*http.Response, error) {
+	return http.Get(url.String())
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {

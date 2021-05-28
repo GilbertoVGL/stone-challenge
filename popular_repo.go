@@ -5,13 +5,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	"github.com/gorilla/mux"
 )
-
-const starRepoURL = "https://api.github.com/users/%s/repos"
 
 type Owner struct {
 	Login               string `json:"login"`
@@ -116,6 +113,8 @@ type RepoData struct {
 	Permissions       `json:"permissions"`
 }
 
+const starRepoURL = "https://api.github.com/users/%s/repos?sort=stargazers_count&direction=desc&per_page=1"
+
 func getPopularRepo(w http.ResponseWriter, r *http.Request) {
 	log.Println("called getPopularRepo")
 
@@ -129,33 +128,30 @@ func getPopularRepo(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Fatalln("error: ", err)
-		respondWithError(w, http.StatusBadRequest, "unable to parse URL")
+		respondWithError(w, http.StatusBadRequest, "unable to build github URL")
 	}
 
-	body, err := fetchRepo(parsedUrl)
+	body, err := fetch(parsedUrl)
 
 	if err != nil {
 		log.Fatalln("error: ", err)
 		respondWithError(w, http.StatusBadRequest, "unable to fetch user repositories")
 	}
 
-	err = parseResponse(body, &userRepositories)
+	err = parsePopularRepoResponse(body, &userRepositories)
 
 	if err != nil {
 		log.Fatalln("error: ", err)
 		respondWithError(w, http.StatusBadRequest, "unable to parse github response")
 	}
 
-	repoData := sortByStars(userRepositories)
+	log.Printf("Found %d repositories of %s\n", len(userRepositories), user)
+	repoData := sortRepoByStars(userRepositories)
 
 	respondWithJSON(w, http.StatusOK, repoData)
 }
 
-func fetchRepo(url *url.URL) (*http.Response, error) {
-	return http.Get(url.String())
-}
-
-func parseResponse(resp *http.Response, reposData *[]RepoData) error {
+func parsePopularRepoResponse(resp *http.Response, reposData *[]RepoData) error {
 	v, err := io.ReadAll(resp.Body)
 
 	if err != nil {
@@ -165,7 +161,11 @@ func parseResponse(resp *http.Response, reposData *[]RepoData) error {
 	return json.Unmarshal(v, reposData)
 }
 
-func sortByStars(reposData []RepoData) RepoData {
+func fetchPaginated() {
+	
+}
+
+func sortRepoByStars(reposData []RepoData) RepoData {
 	var repoData RepoData
 
 	log.Printf("sorting by stars count\n")
