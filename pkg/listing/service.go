@@ -13,9 +13,10 @@ import (
 
 const mostPopularIssueURL = "https://api.github.com/repos/%s/%s/issues?state=open&sort=comments&direction=desc&per_page=1"
 const starRepoURL = "https://api.github.com/users/%s/repos?sort=stargazers_count&direction=desc&per_page=1"
+const openPRURL = "https://api.github.com/repos/{owner}/{repo}/pulls?sort=popularity&direction=asc&per_page=1&state=open"
 
 func GetMostPopularIssue(w http.ResponseWriter, r *http.Request) {
-	log.Println("called getPopularIssue")
+	log.Println("called get popular issue")
 	var repoIssues []IssueData
 	vars := mux.Vars(r)
 	user := vars["user"]
@@ -63,7 +64,7 @@ func parsePopularIssueResponse(resp *http.Response, issuesData *[]IssueData) err
 }
 
 func GetPopularRepo(w http.ResponseWriter, r *http.Request) {
-	log.Println("called getPopularRepo")
+	log.Println("called get popular repo")
 
 	var userRepositories []RepoData
 	vars := mux.Vars(r)
@@ -106,6 +107,44 @@ func parsePopularRepoResponse(resp *http.Response, reposData *[]RepoData) error 
 	}
 
 	return json.Unmarshal(v, reposData)
+}
+
+func GetOpenPR(w http.ResponseWriter, r *http.Request) {
+	log.Println("called get open pull request")
+
+	var userRepositories []RepoData
+	vars := mux.Vars(r)
+	user := vars["user"]
+	repo := vars["repository"]
+
+	log.Println("user: ", user)
+	log.Println("repo: ", repo)
+
+	parsedUrl, err := rest.BuildUrl(openPRURL, user, repo)
+
+	if err != nil {
+		log.Fatalln("BuildUrl error: ", err)
+		rest.RespondWithError(w, http.StatusBadRequest, "unable to build github URL")
+	}
+
+	body, err := rest.Fetch(parsedUrl)
+
+	if err != nil {
+		log.Fatalln("Fetch error: ", err)
+		rest.RespondWithError(w, http.StatusBadRequest, "unable to fetch user repositories")
+	}
+
+	err = parsePopularRepoResponse(body, &userRepositories)
+
+	if err != nil {
+		log.Fatalln("parsePopularRepoResponse error: ", err)
+		rest.RespondWithError(w, http.StatusBadRequest, "unable to parse github response")
+	}
+
+	log.Printf("Found %d repositories of %s\n", len(userRepositories), user)
+	repoData := sortRepoByStars(userRepositories)
+
+	rest.RespondWithJSON(w, http.StatusOK, repoData)
 }
 
 func fetchPaginated() {
