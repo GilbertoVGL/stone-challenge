@@ -1,14 +1,6 @@
-package main
+package listing
 
-import (
-	"encoding/json"
-	"io"
-	"log"
-	"net/http"
-	"time"
-
-	"github.com/gorilla/mux"
-)
+import "time"
 
 type Owner struct {
 	Login               string `json:"login"`
@@ -111,73 +103,4 @@ type RepoData struct {
 	Updated_at        time.Time `json:"updated_at"`
 	Owner             `json:"owner"`
 	Permissions       `json:"permissions"`
-}
-
-const starRepoURL = "https://api.github.com/users/%s/repos?sort=stargazers_count&direction=desc&per_page=1"
-
-func getPopularRepo(w http.ResponseWriter, r *http.Request) {
-	log.Println("called getPopularRepo")
-
-	var userRepositories []RepoData
-	vars := mux.Vars(r)
-	user := vars["user"]
-
-	log.Println("user: ", user)
-
-	parsedUrl, err := buildUrl(starRepoURL, user)
-
-	if err != nil {
-		log.Fatalln("error: ", err)
-		respondWithError(w, http.StatusBadRequest, "unable to build github URL")
-	}
-
-	body, err := fetch(parsedUrl)
-
-	if err != nil {
-		log.Fatalln("error: ", err)
-		respondWithError(w, http.StatusBadRequest, "unable to fetch user repositories")
-	}
-
-	err = parsePopularRepoResponse(body, &userRepositories)
-
-	if err != nil {
-		log.Fatalln("error: ", err)
-		respondWithError(w, http.StatusBadRequest, "unable to parse github response")
-	}
-
-	log.Printf("Found %d repositories of %s\n", len(userRepositories), user)
-	repoData := sortRepoByStars(userRepositories)
-
-	respondWithJSON(w, http.StatusOK, repoData)
-}
-
-func parsePopularRepoResponse(resp *http.Response, reposData *[]RepoData) error {
-	v, err := io.ReadAll(resp.Body)
-
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(v, reposData)
-}
-
-func fetchPaginated() {
-	
-}
-
-func sortRepoByStars(reposData []RepoData) RepoData {
-	var repoData RepoData
-
-	log.Printf("sorting by stars count\n")
-	for _, r := range reposData {
-		log.Printf("\t%c %v\t %v\n", 9734, r.Stargazers_count, r.Name)
-
-		if r.Stargazers_count > repoData.Stargazers_count {
-			repoData = r
-		}
-	}
-
-	log.Printf("Selected:\t%c %v\t %v\n", 9734, repoData.Stargazers_count, repoData.Name)
-
-	return repoData
 }

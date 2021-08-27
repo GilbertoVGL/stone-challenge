@@ -1,4 +1,4 @@
-module ghub-public-api
+module ghub-api
 
 go 1.16
 
