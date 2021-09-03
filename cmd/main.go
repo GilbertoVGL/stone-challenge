@@ -19,7 +19,7 @@ func handleRequests() {
 	r.HandleFunc("/users/{user}/repositories/{repository}/popular-issue", listing.GetMostPopularIssue).Methods("GET")
 	r.HandleFunc("/users/{user}/repositories/{repository}/open-pull-requests", listing.GetOpenPR).Methods("GET")
 	walk(r)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe("localhost:8080", r))
 }
 
 func walk(router *mux.Router) {
