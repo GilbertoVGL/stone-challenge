@@ -1,7 +1,9 @@
 package main
 
 import (
-	"ghub-api/pkg/listing"
+	"ghub/pkg/issue"
+	"ghub/pkg/pullrequest"
+	"ghub/pkg/repository"
 	"log"
 	"net/http"
 
@@ -15,9 +17,9 @@ func main() {
 func handleRequests() {
 	log.Println("Starting API")
 	r := mux.NewRouter()
-	r.HandleFunc("/users/{user}/popular-repository", listing.GetPopularRepo).Methods("GET")
-	r.HandleFunc("/users/{user}/repositories/{repository}/popular-issue", listing.GetMostPopularIssue).Methods("GET")
-	r.HandleFunc("/users/{user}/repositories/{repository}/open-pull-requests", listing.GetOpenPR).Methods("GET")
+	r.HandleFunc("/users/{user}/popular-repository", repository.GetPopular).Methods("GET")
+	r.HandleFunc("/users/{user}/repositories/{repository}/popular-issue", issue.GetPopular).Methods("GET")
+	r.HandleFunc("/users/{user}/repositories/{repository}/open-pull-requests", pullrequest.GetOpen).Methods("GET")
 	walk(r)
 	log.Fatal(http.ListenAndServe("localhost:8080", r))
 }
