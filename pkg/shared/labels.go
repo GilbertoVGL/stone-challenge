@@ -1,4 +1,4 @@
-package listing
+package shared
 
 type Labels struct {
 	Id          int    `json:"id"`

@@ -1,6 +1,6 @@
-package listing
+package shared
 
-type User struct {
+type Owner struct {
 	Login               string `json:"login"`
 	Id                  int    `json:"id"`
 	Node_id             string `json:"node_id"`
@@ -17,6 +17,6 @@ type User struct {
 	Repos_url           string `json:"repos_url"`
 	Events_url          string `json:"events_url"`
 	Received_events_url string `json:"received_events_url"`
-	Type                string `json:"Type"`
+	Type                string `json:"type"`
 	Site_admin          bool   `json:"site_admin"`
 }

@@ -1,4 +1,4 @@
-module ghub-api
+module ghub
 
 go 1.16
 

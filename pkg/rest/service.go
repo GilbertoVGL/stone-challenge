@@ -5,25 +5,31 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
-func BuildUrl(urlSnippet string, complement ...string) (*url.URL, error) {
-	var genericStrings []interface{} = make([]interface{}, len(complement))
+func NewURL(urlSnippet string, complement ...interface{}) (*url.URL, error) {
+	var genericStrings = make([]interface{}, len(complement))
 	for i, s := range complement {
-		genericStrings[i] = s
+		switch v := s.(type) {
+		case int:
+			genericStrings[i] = strconv.FormatInt(int64(v), 10)
+		case string:
+			genericStrings[i] = v
+		}
 	}
 	return url.Parse(fmt.Sprintf(urlSnippet, genericStrings...))
 }
 
-func Fetch(url *url.URL) (*http.Response, error) {
+func Get(url *url.URL) (*http.Response, error) {
 	return http.Get(url.String())
 }
 
-func RespondWithError(w http.ResponseWriter, code int, message string) {
-	RespondWithJSON(w, code, map[string]string{"error": message})
+func ErrorResp(w http.ResponseWriter, code int, message string) {
+	JSONresp(w, code, map[string]string{"error": message})
 }
 
-func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
+func JSONresp(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	json.NewEncoder(w).Encode(payload)

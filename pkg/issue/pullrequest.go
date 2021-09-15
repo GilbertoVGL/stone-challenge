@@ -1,6 +1,9 @@
-package listing
+package issue
 
-import "time"
+import (
+	"ghub/pkg/shared"
+	"time"
+)
 
 type RequestedReviewers struct {
 	Login               string `json:"login"`
@@ -104,8 +107,8 @@ type PrRepoData struct {
 	Pushed_at              time.Time `json:"pushed_at"`
 	Created_at             time.Time `json:"created_at"`
 	Updated_at             time.Time `json:"updated_at"`
-	Owner                  `json:"owner"`
-	Permissions            `json:"permissions"`
+	shared.Owner           `json:"owner"`
+	shared.Permissions     `json:"permissions"`
 	Allow_rebase_merge     bool   `json:"allow_rebase_merge"`
 	Template_repository    string `json:"template_repository"`
 	Temp_clone_token       string `json:"temp_clone_token"`
@@ -122,11 +125,11 @@ type PrRepoData struct {
 }
 
 type Head struct {
-	Label string `json:"label"`
-	Ref   string `json:"ref"`
-	Sha   string `json:"sha"`
-	User  `json:"user"`
-	Repo  PrRepoData `json:"repo"`
+	Label       string `json:"label"`
+	Ref         string `json:"ref"`
+	Sha         string `json:"sha"`
+	shared.User `json:"user"`
+	Repo        PrRepoData `json:"repo"`
 }
 
 type RequestedTeams struct {
@@ -197,18 +200,18 @@ type PullRequest struct {
 	State                 string `json:"state"`
 	Locked                bool   `json:"locked"`
 	Title                 string `json:"title"`
-	User                  `json:"user"`
-	Body                  string   `json:"body"`
-	Labels                []Labels `json:"labels"`
-	Milestone             `json:"milestone"`
+	shared.User           `json:"user"`
+	Body                  string          `json:"body"`
+	Labels                []shared.Labels `json:"labels"`
+	shared.Milestone      `json:"milestone"`
 	Active_lock_reason    string `json:"active_lock_reason"`
 	Created_at            string `json:"created_at"`
 	Updated_at            string `json:"updated_at"`
 	Closed_at             string `json:"closed_at"`
 	Merged_at             string `json:"merged_at"`
 	Merge_commit_sha      string `json:"merge_commit_sha"`
-	Assignee              `json:"assignee"`
-	Assignees             []Assignee           `json:"assignees"`
+	shared.Assignee       `json:"assignee"`
+	Assignees             []shared.Assignee    `json:"assignees"`
 	Requested_reviewers   []RequestedReviewers `json:"requested_reviewers"`
 	RequestedTeams        []RequestedTeams     `json:"requested_teams"`
 	Head                  `json:"head"`

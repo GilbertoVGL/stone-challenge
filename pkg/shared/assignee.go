@@ -1,4 +1,4 @@
-package listing
+package shared
 
 type Assignee struct {
 	Login               string `json:"login"`

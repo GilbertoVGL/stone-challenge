@@ -1,6 +1,9 @@
-package listing
+package issue
 
-import "time"
+import (
+	"ghub/pkg/shared"
+	"time"
+)
 
 type IssueData struct {
 	Id                 int       `json:"id"`
@@ -22,10 +25,10 @@ type IssueData struct {
 	Created_at         time.Time `json:"created_at"`
 	Updated_at         time.Time `json:"updated_at"`
 	Author_association string    `json:"author_association"`
-	User               `json:"user"`
-	Labels             []Labels `json:"labels"`
-	Assignee           `json:"assignee"`
-	Assignees          []Assignee `json:"assignees"`
-	Milestone          `json:"milestone"`
+	shared.User        `json:"user"`
+	Labels             []shared.Labels `json:"labels"`
+	shared.Assignee    `json:"assignee"`
+	Assignees          []shared.Assignee `json:"assignees"`
+	shared.Milestone   `json:"milestone"`
 	PullRequest        `json:"pull_request"`
 }

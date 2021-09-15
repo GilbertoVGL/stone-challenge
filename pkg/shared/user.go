@@ -1,6 +1,6 @@
-package listing
+package shared
 
-type Creator struct {
+type User struct {
 	Login               string `json:"login"`
 	Id                  int    `json:"id"`
 	Node_id             string `json:"node_id"`
